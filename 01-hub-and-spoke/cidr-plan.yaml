@@ -1,0 +1,16 @@
+# cidr-plan.yaml
+# Full address plan for cloud-portfolio
+# CI fails on overlapping ranges — checked by shared/scripts/check-cidrs.py
+# Include your home LAN range to prevent conflicts in future hybrid projects
+
+networks:
+  azure:
+    hub:    "10.0.0.0/16"
+    spoke1: "10.1.0.0/16"
+    spoke2: "10.2.0.0/16"
+  aws:
+    hub:    "10.10.0.0/16"
+    spoke1: "10.11.0.0/16"
+    spoke2: "10.12.0.0/16"
+  home:
+    lan:    "192.168.1.0/24"   # update to match your actual home LAN

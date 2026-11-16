@@ -1,0 +1,64 @@
+{                                                                                                                                                                                                                        
+    "TransitGatewayRouteTables": [
+        {
+            "TransitGatewayRouteTableId": "tgw-rtb-09107ccc364232ce0",
+            "TransitGatewayId": "tgw-00c5b12e668ec298e",
+            "State": "available",
+            "DefaultAssociationRouteTable": false,
+            "DefaultPropagationRouteTable": false,
+            "CreationTime": "2026-11-14T16:24:06+00:00",
+            "Tags": [
+                {
+                    "Key": "sub-project",
+                    "Value": "01-hub-and-spoke"
+                },
+                {
+                    "Key": "project",
+                    "Value": "cloud-portfolio"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "session",                                                                                                                                                                                    
+                    "Value": "aws-01"                                                                                                                                                                                    
+                },                                                                                                                                                                                                       
+                {                                                                                                                                                                                                        
+                    "Key": "Name",                                                                                                                                                                                       
+                    "Value": "tgw-rt-spokes-portfolio-hs"                                                                                                                                                                
+                }                                                                                                                                                                                                        
+            ]                                                                                                                                                                                                            
+        },                                                                                                                                                                                                               
+        {                                                                                                                                                                                                                
+            "TransitGatewayRouteTableId": "tgw-rtb-09c9286b5912fbad6",                                                                                                                                                   
+            "TransitGatewayId": "tgw-00c5b12e668ec298e",                                                                                                                                                                 
+            "State": "available",                                                                                                                                                                                        
+            "DefaultAssociationRouteTable": false,                                                                                                                                                                       
+            "DefaultPropagationRouteTable": false,                                                                                                                                                                       
+            "CreationTime": "2026-11-14T16:24:39+00:00",                                                                                                                                                                 
+            "Tags": [                                                                                                                                                                                                    
+                {                                                                                                                                                                                                        
+                    "Key": "sub-project",                                                                                                                                                                                
+                    "Value": "01-hub-and-spoke"                                                                                                                                                                          
+                },                                                                                                                                                                                                       
+                {                                                                                                                                                                                                        
+                    "Key": "project",                                                                                                                                                                                    
+                    "Value": "cloud-portfolio"                                                                                                                                                                           
+                },                                                                                                                                                                                                       
+                {                                                                                                                                                                                                        
+                    "Key": "managed-by",                                                                                                                                                                                 
+                    "Value": "terraform"                                                                                                                                                                                 
+                },                                                                                                                                                                                                       
+                {                                                                                                                                                                                                        
+                    "Key": "session",                                                                                                                                                                                    
+                    "Value": "aws-01"                                                                                                                                                                                    
+                },                                                                                                                                                                                                       
+                {                                                                                                                                                                                                        
+                    "Key": "Name",                                                                                                                                                                                       
+                    "Value": "tgw-rt-inspection-portfolio-hs"                                                                                                                                                            
+                }                                                                                                                                                                                                        
+            ]                                                                                                                                                                                                            
+        }                                                                                                                                                                                                                
+    ]                                                                                                                                                                                                                    
+}                

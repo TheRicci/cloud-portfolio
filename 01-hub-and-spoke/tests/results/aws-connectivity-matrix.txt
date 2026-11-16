@@ -1,0 +1,9 @@
+========================================================
+Hub-and-Spoke — AWS Validation Matrix
+========================================================
+PASS | Spoke1 local TCP/8443 test service is healthy
+PASS | Spoke2 local TCP/8443 test service is healthy
+PASS | Spoke1 -> Spoke2 TCP/8443 is allowed
+PASS | Spoke2 -> Spoke1 TCP/8443 is denied
+PASS | Spoke1 -> NVA TCP/22 is denied
+PASS | NVA records forwarded TCP/8443 traffic | packets: 3

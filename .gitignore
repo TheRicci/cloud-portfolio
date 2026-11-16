@@ -1,0 +1,25 @@
+terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+*.tfvars
+*.tfvars.json
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Evidence is committed — do NOT ignore project evidence/ folders.
+# But ignore any local scratch files
+*.local.*
+scratch/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
