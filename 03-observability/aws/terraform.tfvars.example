@@ -1,0 +1,23 @@
+# Copy this file to terraform.tfvars and fill in your values.
+# terraform.tfvars is gitignored — never commit it.
+#
+# Usage:
+#   cp terraform.tfvars.example terraform.tfvars
+#   # edit terraform.tfvars
+#   terraform plan
+#   terraform apply
+
+region     = "us-east-1"
+alert_email = "you@example.com"
+
+# ── AWS SES ────────────────────────────────────────────────────────────────────
+# smtp_from must be a verified SES identity (SES → Verified identities).
+# smtp_username and smtp_password come from SES → SMTP settings → Create SMTP credentials.
+# Note: smtp_password is the derived SMTP secret shown once at creation, NOT the IAM secret key.
+smtp_from     = "you@example.com"
+smtp_username = "AKIAIOSFODNN7EXAMPLE"
+smtp_password = "REPLACE_WITH_SES_SMTP_PASSWORD"
+
+# ── Grafana ────────────────────────────────────────────────────────────────────
+# Choose a long unique password. Avoid the two-character sequence ${ in the value.
+grafana_admin_password = "REPLACE_WITH_A_STRONG_PASSWORD"

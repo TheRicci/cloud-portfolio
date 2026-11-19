@@ -1,0 +1,11 @@
+# Copy to backend.tf or pass equivalent -backend-config values to terraform init.
+# terraform {
+#   backend "azurerm" {
+#     resource_group_name  = "REPLACE_ME"
+#     storage_account_name = "REPLACE_ME"
+#     container_name       = "tfstate"
+#     key                  = "03-observability/azure.tfstate"
+#     use_azuread_auth     = true
+#   }
+# }
+

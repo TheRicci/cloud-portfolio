@@ -1,0 +1,35 @@
+global:
+  smtp_smarthost: "${SMTP_SMARTHOST}"
+  smtp_from: "${SMTP_FROM}"
+  smtp_auth_username: "${SMTP_USERNAME}"
+  smtp_auth_password: "${SMTP_PASSWORD}"
+  smtp_require_tls: true
+
+route:
+  receiver: warning-email
+  group_by: [alertname, severity]
+  group_wait: 15s
+  group_interval: 1m
+  repeat_interval: 4h
+  routes:
+    - matchers: [severity="critical"]
+      receiver: critical-email
+
+receivers:
+  - name: warning-email
+    email_configs:
+      - to: "${ALERT_EMAIL}"
+        send_resolved: true
+  - name: critical-email
+    email_configs:
+      - to: "${ALERT_EMAIL}"
+        send_resolved: true
+
+inhibit_rules:
+  - source_matchers: [alertname="CriticalErrorRate"]
+    target_matchers: [alertname="HighErrorRate"]
+    equal: []
+  - source_matchers: [alertname="ServiceDown"]
+    target_matchers: [alertname=~"HighErrorRate|SlowResponses"]
+    equal: []
+

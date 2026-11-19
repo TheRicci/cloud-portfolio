@@ -1,0 +1,77 @@
+{
+  "apiVersion": 1,
+  "groups": [
+    {
+      "name": "observability-log-alerts",
+      "folder": "Cloud Portfolio",
+      "interval": "1m",
+      "rules": [
+        {
+          "uid": "portfolio-observability-error-log-burst",
+          "title": "Service error log burst",
+          "condition": "B",
+          "data": [
+            {
+              "refId": "A",
+              "queryType": "",
+              "relativeTimeRange": {
+                "from": 120,
+                "to": 0
+              },
+              "datasourceUid": "REPLACE_LOKI_DATASOURCE_UID",
+              "model": {
+                "expr": "sum by (cloud) (count_over_time({container=\"obs-service\"} |= \"work request failed\" [2m]))",
+                "instant": true,
+                "range": false,
+                "refId": "A"
+              }
+            },
+            {
+              "refId": "B",
+              "queryType": "",
+              "relativeTimeRange": {
+                "from": 0,
+                "to": 0
+              },
+              "datasourceUid": "__expr__",
+              "model": {
+                "type": "threshold",
+                "expression": "A",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "params": [
+                        5
+                      ],
+                      "type": "gt"
+                    },
+                    "operator": {
+                      "type": "and"
+                    },
+                    "reducer": {
+                      "params": [],
+                      "type": "last"
+                    },
+                    "type": "query"
+                  }
+                ],
+                "refId": "B"
+              }
+            }
+          ],
+          "for": "1m",
+          "noDataState": "OK",
+          "execErrState": "Error",
+          "annotations": {
+            "summary": "The service is emitting repeated 5xx error logs.",
+            "description": "More than five failed work requests were logged in two minutes. Check the service logs and fault state first."
+          },
+          "labels": {
+            "severity": "warning"
+          }
+        }
+      ]
+    }
+  ]
+}
+

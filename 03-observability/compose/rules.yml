@@ -1,0 +1,98 @@
+groups:
+  - name: service-and-host
+    rules:
+      - alert: CriticalErrorRate
+        expr: |
+          (
+            sum(rate(http_requests_total{code_class="5xx"}[2m]))
+            /
+            sum(rate(http_requests_total[2m]))
+          ) > 0.20
+          and sum(rate(http_requests_total[2m])) > 0.5
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: More than 20 percent of work requests are failing.
+          description: The service has a sustained critical 5xx rate. Check the fault setting and service logs first.
+      - alert: HighErrorRate
+        expr: |
+          (
+            sum(rate(http_requests_total{code_class="5xx"}[2m]))
+            /
+            sum(rate(http_requests_total[2m]))
+          ) > 0.05
+          and sum(rate(http_requests_total[2m])) > 0.5
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: More than 5 percent of work requests are failing.
+          description: The service has a sustained high 5xx rate. Check the service logs and the current fault configuration first.
+      - alert: NoTraffic
+        expr: sum(rate(http_requests_total[5m])) == 0 and on() (up{job="service"} == 1)
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: The service is healthy but has not received work requests.
+          description: The service is up but no requests have arrived. Check the load generator and expected traffic first.
+      - alert: SlowResponses
+        expr: histogram_quantile(0.95, sum by (le) (rate(http_request_duration_seconds_bucket[2m]))) > 0.3
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: The p95 work latency is over 300 ms.
+          description: The service has sustained slow responses. Check the latency fault and host resource use first.
+      - alert: ServiceDown
+        expr: up{job="service"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: Prometheus cannot scrape the service.
+          description: The service target is down. Check the service container and its health endpoint first.
+      - alert: MonitoringTargetDown
+        expr: up{job=~"node|prometheus|alertmanager"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: A monitoring component cannot be scraped.
+          description: A Prometheus, Alertmanager, or node exporter target is down. Check that component first.
+      - alert: HighCPU
+        expr: 100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[2m])) * 100) > 80
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: VM CPU use is above 80 percent.
+          description: The VM has sustained high CPU use. Check the active processes and test load first.
+      - alert: HighMemory
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 90
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: VM memory use is above 90 percent.
+          description: The VM has sustained high memory use. Check container memory use first.
+      - alert: DiskLow
+        expr: |
+          node_filesystem_avail_bytes{fstype!~"tmpfs|overlay"} /
+          node_filesystem_size_bytes{fstype!~"tmpfs|overlay"} < 0.10
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: Less than 10 percent of disk space remains.
+          description: A host filesystem is nearly full. Check Docker images, volumes, and logs first.
+      - alert: AlertNotificationsFailing
+        expr: increase(alertmanager_notifications_failed_total[5m]) > 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: Alertmanager could not deliver a notification.
+          description: A notification delivery failed. Check SMTP credentials and Alertmanager logs first.
+

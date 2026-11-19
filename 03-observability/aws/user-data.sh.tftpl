@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+export DEBIAN_FRONTEND=noninteractive
+apt-get update
+apt-get install -y ca-certificates curl jq tar docker.io docker-compose-v2 stress-ng
+systemctl enable --now docker
+
+install -d -m 0755 /opt/observability /etc/observability
+base64 --decode >/tmp/observability-runtime.tar.gz <<'RUNTIME_BUNDLE'
+${runtime_bundle_base64}
+RUNTIME_BUNDLE
+tar -xzf /tmp/observability-runtime.tar.gz -C /opt/observability
+rm -f /tmp/observability-runtime.tar.gz
+
+# Write runtime.env for Alertmanager and Grafana
+cat >/etc/observability/runtime.env <<'RUNTIME_ENV'
+SMTP_SMARTHOST=email-smtp.${region}.amazonaws.com:587
+SMTP_FROM=${smtp_from}
+SMTP_USERNAME=${smtp_username}
+SMTP_PASSWORD=${smtp_password}
+ALERT_EMAIL=${alert_email}
+GF_SECURITY_ADMIN_USER=admin
+GF_SECURITY_ADMIN_PASSWORD=${grafana_admin_password}
+RUNTIME_ENV
+chown root:root /etc/observability/runtime.env
+chmod 0600 /etc/observability/runtime.env
+
+cat >/usr/local/bin/start-observability <<'SCRIPT'
+#!/usr/bin/env bash
+set -euo pipefail
+cd /opt/observability/compose
+RUNTIME_ENV_FILE=/etc/observability/runtime.env docker compose up --build -d
+SCRIPT
+chmod 0755 /usr/local/bin/start-observability
+
+# Lightweight on-VM scenario demo helper
+cat >/opt/observability/demo.sh <<'DEMO'
+#!/usr/bin/env bash
+case "$${1:-status}" in
+  status)
+    docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+    ;;
+  baseline|load)
+    docker compose -f /opt/observability/compose/docker-compose.yml --profile test run -d --name obs-k6 --rm -e RATE=5 -e DURATION=4h k6 run /scripts/k6.js
+    echo "Started baseline load."
+    ;;
+  fault-error)
+    curl -fsS -X POST "http://127.0.0.1:8081/faults?error=0.25&delay_ms=0"
+    echo "Injected 25% errors. Wait 60s for HighErrorRate alert."
+    ;;
+  fault-latency)
+    curl -fsS -X POST "http://127.0.0.1:8081/faults?error=0&delay_ms=400"
+    echo "Injected 400ms latency. Wait 60s for SlowResponses alert."
+    ;;
+  fault-cpu)
+    stress-ng --cpu 2 --timeout 6m &
+    echo "Started CPU burn (6 min). Wait 5m for CloudWatch alarm."
+    ;;
+  clean)
+    curl -fsS -X POST "http://127.0.0.1:8081/faults?error=0&delay_ms=0" || true
+    pkill -f stress-ng || true
+    echo "Cleared all faults."
+    ;;
+esac
+DEMO
+chmod 0755 /opt/observability/demo.sh
+
+/usr/local/bin/start-observability

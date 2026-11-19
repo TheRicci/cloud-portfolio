@@ -1,0 +1,31 @@
+{
+  "started": "2026-11-19T16:40:45Z",
+  "finished": "2026-11-19T16:57:44Z",
+  "clouds": "aws",
+  "checks": {
+    "count": {
+      "status": "PASS",
+      "detail": "Stopped k6 and compared direct service counter deltas."
+    },
+    "notification": {
+      "status": "FAIL",
+      "detail": "Alertmanager notification delivery did not succeed."
+    },
+    "error_log_alert": {
+      "status": "FAIL",
+      "detail": "Grafana did not observe fresh Loki error logs."
+    },
+    "error_fault": {
+      "status": "PASS",
+      "detail": "HighErrorRate fired with VM-side source timestamps."
+    },
+    "ready": {
+      "status": "PASS",
+      "detail": "Prometheus and Alertmanager APIs responded."
+    },
+    "baseline": {
+      "status": "FAIL",
+      "detail": "The VM-side baseline computation failed."
+    }
+  }
+}

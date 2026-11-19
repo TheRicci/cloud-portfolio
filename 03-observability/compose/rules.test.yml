@@ -1,0 +1,61 @@
+rule_files:
+  - rules.yml
+
+evaluation_interval: 1m
+
+tests:
+  - name: high error rate fires but critical does not
+    interval: 1m
+    input_series:
+      - series: 'http_requests_total{code_class="2xx"}'
+        values: '0+60x6'
+      - series: 'http_requests_total{code_class="5xx"}'
+        values: '0+6x6'
+    alert_rule_test:
+      - eval_time: 3m
+        alertname: HighErrorRate
+        exp_alerts:
+          - exp_labels:
+              alertname: HighErrorRate
+              severity: warning
+      - eval_time: 3m
+        alertname: CriticalErrorRate
+        exp_alerts: []
+  - name: critical error rate fires
+    interval: 1m
+    input_series:
+      - series: 'http_requests_total{code_class="2xx"}'
+        values: '0+20x6'
+      - series: 'http_requests_total{code_class="5xx"}'
+        values: '0+20x6'
+    alert_rule_test:
+      - eval_time: 3m
+        alertname: CriticalErrorRate
+        exp_alerts:
+          - exp_labels:
+              alertname: CriticalErrorRate
+              severity: critical
+  - name: service down fires
+    interval: 1m
+    input_series:
+      - series: 'up{job="service"}'
+        values: '0+0x3'
+    alert_rule_test:
+      - eval_time: 2m
+        alertname: ServiceDown
+        exp_alerts:
+          - exp_labels:
+              alertname: ServiceDown
+              severity: critical
+  - name: healthy traffic does not fire no traffic
+    interval: 1m
+    input_series:
+      - series: 'http_requests_total{code_class="2xx"}'
+        values: '0+60x8'
+      - series: 'up{job="service"}'
+        values: '1+0x8'
+    alert_rule_test:
+      - eval_time: 6m
+        alertname: NoTraffic
+        exp_alerts: []
+

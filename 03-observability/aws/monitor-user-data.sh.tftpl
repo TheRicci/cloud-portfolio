@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+export DEBIAN_FRONTEND=noninteractive
+apt-get update
+apt-get install -y ca-certificates curl jq tar docker.io docker-compose-v2
+systemctl enable --now docker
+
+install -d -m 0755 /opt/monitoring /etc/observability
+base64 --decode >/tmp/monitoring-runtime.tar.gz <<'RUNTIME_BUNDLE'
+${monitoring_bundle_base64}
+RUNTIME_BUNDLE
+tar -xzf /tmp/monitoring-runtime.tar.gz -C /opt/monitoring
+rm -f /tmp/monitoring-runtime.tar.gz
+chmod 0755 /opt/monitoring/monitor-session.sh
+sed -e 's/\$${DS_PROMETHEUS}/prometheus/g' -e 's/\$${DS_LOKI}/loki/g' \
+  /opt/monitoring/dashboards/dashboard.json >/tmp/dashboard.json
+mv /tmp/dashboard.json /opt/monitoring/dashboards/dashboard.json
+
+# Write monitoring.env from Terraform-supplied values (no manual SSM editing needed).
+install -d -m 0755 /etc/observability
+cat >/etc/observability/monitoring.env <<'MONITORING_ENV'
+GF_SECURITY_ADMIN_USER=admin
+GF_SECURITY_ADMIN_PASSWORD=${grafana_admin_password}
+GF_SMTP_ENABLED=true
+GF_SMTP_HOST=email-smtp.${region}.amazonaws.com:587
+GF_SMTP_USER=${smtp_username}
+GF_SMTP_PASSWORD=${smtp_password}
+GF_SMTP_FROM_ADDRESS=${smtp_from}
+GF_SMTP_FROM_NAME="Portfolio monitoring"
+GRAFANA_ALERT_EMAIL=${alert_email}
+MONITORING_ENV
+chown root:root /etc/observability/monitoring.env
+chmod 0600 /etc/observability/monitoring.env
+
+cat >/usr/local/bin/start-monitoring <<'SCRIPT'
+#!/usr/bin/env bash
+set -euo pipefail
+test -f /etc/observability/monitoring.env
+cd /opt/monitoring
+docker compose up -d
+SCRIPT
+chmod 0755 /usr/local/bin/start-monitoring
+
+/usr/local/bin/start-monitoring

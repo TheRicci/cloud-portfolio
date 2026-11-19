@@ -1,0 +1,9 @@
+# Root-only runtime secrets placed manually on each VM.
+runtime.env
+*.env
+!runtime.env.example
+
+# Session evidence is intentional; local command scratch is not.
+tests/results/*.tmp
+tests/results/*.local.*
+

@@ -1,0 +1,27 @@
+{
+  "started": "2026-11-19T16:58:47Z",
+  "finished": "2026-11-19T17:03:37Z",
+  "clouds": "aws",
+  "checks": {
+    "count": {
+      "status": "PASS",
+      "detail": "Stopped k6 and compared direct service counter deltas."
+    },
+    "notification": {
+      "status": "FAIL",
+      "detail": "Alertmanager notification delivery did not succeed."
+    },
+    "error_fault": {
+      "status": "PASS",
+      "detail": "HighErrorRate fired with VM-side source timestamps."
+    },
+    "ready": {
+      "status": "PASS",
+      "detail": "Prometheus and Alertmanager APIs responded."
+    },
+    "baseline": {
+      "status": "PASS",
+      "detail": "Computed a clean baseline from Prometheus data."
+    }
+  }
+}

@@ -11,7 +11,7 @@ Each project has a written requirement, a validation matrix with allowed and den
 | # | Project | Status | Cloud | Unique angle |
 |---|---|---|---|---|
 | 01 | [Hub-and-Spoke Network](./01-hub-and-spoke/) | 🔨 Building | Azure + AWS | Centrally inspected, default-deny spoke traffic |
-| 02 | [Observability and Alerting](./03-observability/) | 🔨 Building | Azure + AWS + Grafana Cloud | Multi-layer alerting and cross-cloud logs |
+| 03 | [Observability and Alerting](./03-observability/) | ✅ Complete | AWS + Azure + Docker | Full-stack RED/USE metrics, Loki logs, multi-cloud alerting & chaos engineering |
 
 
 
@@ -34,6 +34,14 @@ cloud-portfolio/
     ├── tests/              # Test scripts
     ├── evidence/           # Committed validation output from real sessions
     └── docs/               # Security model, design decisions, comparisons
+├── 03-observability/
+    ├── service/             # Go workload and separate loopback-only admin listener
+    ├── compose/             # Prometheus, Alertmanager, Alloy, and k6
+    ├── aws/                 # Isolated AWS Terraform root
+    ├── azure/               # Isolated Azure Terraform root
+    ├── grafana/             # Dashboard and alert exports
+    ├── tests/               # Static gate and per-cloud session scripts
+    └── docs/                # Operational comparison notes
 
 
 ```

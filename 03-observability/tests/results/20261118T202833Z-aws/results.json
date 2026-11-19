@@ -1,0 +1,87 @@
+{
+  "started": "2026-11-18T20:28:33Z",
+  "finished": "2026-11-18T21:01:22Z",
+  "clouds": "aws",
+  "checks": {
+    "pipeline_cut": {
+      "status": "FAIL",
+      "detail": "Grafana no-data alert was not observed."
+    },
+    "count": {
+      "status": "PASS",
+      "detail": "Stopped k6 and compared direct service counter deltas."
+    },
+    "error_native_quiet": {
+      "status": "FAIL",
+      "detail": "A native CPU alarm fired during the error fault."
+    },
+    "notification": {
+      "status": "FAIL",
+      "detail": "Alertmanager notification delivery did not succeed."
+    },
+    "pipeline_prom_quiet": {
+      "status": "FAIL",
+      "detail": "A Prometheus alert fired during the Alloy cut."
+    },
+    "error_log_alert": {
+      "status": "FAIL",
+      "detail": "Grafana did not observe fresh Loki error logs."
+    },
+    "error_fault": {
+      "status": "FAIL",
+      "detail": "HighErrorRate was not observed."
+    },
+    "cpu_resolution": {
+      "status": "FAIL",
+      "detail": "HighCPU did not resolve."
+    },
+    "no_traffic_resolution": {
+      "status": "FAIL",
+      "detail": "NoTraffic did not resolve."
+    },
+    "no_traffic": {
+      "status": "FAIL",
+      "detail": "NoTraffic was not observed."
+    },
+    "service_down": {
+      "status": "FAIL",
+      "detail": "ServiceDown did not complete."
+    },
+    "latency_fault": {
+      "status": "FAIL",
+      "detail": "SlowResponses was not observed."
+    },
+    "ready": {
+      "status": "PASS",
+      "detail": "Prometheus and Alertmanager APIs responded."
+    },
+    "latency_resolution": {
+      "status": "FAIL",
+      "detail": "SlowResponses did not resolve."
+    },
+    "critical_error_resolution": {
+      "status": "FAIL",
+      "detail": "CriticalErrorRate did not resolve."
+    },
+    "cpu_prometheus": {
+      "status": "FAIL",
+      "detail": "HighCPU was not observed."
+    },
+    "baseline": {
+      "status": "FAIL",
+      "detail": "The VM-side baseline computation failed."
+    },
+    "error_resolution": {
+      "status": "FAIL",
+      "detail": "HighErrorRate did not resolve."
+    },
+    "cpu_burn": {
+      "status": "FAIL",
+      "detail": "A native CPU alarm was not observed."
+    },
+    "critical_error_fault": {
+      "status": "FAIL",
+      "detail": "CriticalErrorRate was not observed."
+    }
+  }
+}
