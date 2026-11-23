@@ -1,0 +1,8 @@
+# Copy to backend.tf and fill in your values.
+# terraform {
+#   backend "s3" {
+#     bucket = "your-terraform-state-bucket"
+#     key    = "04-backup-and-restore/aws/terraform.tfstate"
+#     region = "us-east-1"
+#   }
+# }

@@ -1,0 +1,4 @@
+# Copy to terraform.tfvars and fill in your values.
+location             = "eastus"
+admin_ssh_public_key = "ssh-ed25519 AAAA..."
+alert_email          = "you@example.com"

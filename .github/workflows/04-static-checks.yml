@@ -1,0 +1,63 @@
+name: "04 — Static Checks"
+
+on:
+  push:
+    paths:
+      - "04-backup-and-restore/**"
+  pull_request:
+    paths:
+      - "04-backup-and-restore/**"
+
+jobs:
+  terraform-fmt:
+    name: Terraform Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~1.9"
+
+      - name: terraform fmt — AWS
+        run: terraform fmt -check -recursive
+        working-directory: 04-backup-and-restore/aws
+
+      - name: terraform fmt — Azure
+        run: terraform fmt -check -recursive
+        working-directory: 04-backup-and-restore/azure
+
+  terraform-validate:
+    name: Terraform Validate
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        root: [aws, azure]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~1.9"
+
+      - name: terraform init
+        run: terraform init -backend=false
+        working-directory: 04-backup-and-restore/${{ matrix.root }}
+
+      - name: terraform validate
+        run: terraform validate
+        working-directory: 04-backup-and-restore/${{ matrix.root }}
+
+  shellcheck:
+    name: ShellCheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install shellcheck
+        run: sudo apt-get install -y shellcheck
+
+      - name: Run shellcheck
+        run: |
+          find 04-backup-and-restore/tests -name '*.sh' -print0 \
+            | xargs -0 shellcheck --severity=warning

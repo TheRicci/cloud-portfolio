@@ -1,0 +1,9 @@
+# Copy to backend.tf and fill in your values.
+# terraform {
+#   backend "azurerm" {
+#     resource_group_name  = "your-state-rg"
+#     storage_account_name = "yourstatesa"
+#     container_name       = "tfstate"
+#     key                  = "04-backup-and-restore/azure/terraform.tfstate"
+#   }
+# }

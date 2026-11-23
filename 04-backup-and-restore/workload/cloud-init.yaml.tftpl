@@ -1,0 +1,88 @@
+#cloud-config
+package_upgrade: false
+
+packages:
+  - postgresql
+  - golang-go
+  - unzip
+  - curl
+
+write_files:
+  - path: /opt/writer/main.go
+    owner: root:root
+    permissions: "0644"
+    content: |
+      ${indent(6, writer_go_source)}
+
+  - path: /opt/writer/go.mod
+    owner: root:root
+    permissions: "0644"
+    content: |
+      ${indent(6, writer_go_mod)}
+
+  - path: /opt/writer/go.sum
+    owner: root:root
+    permissions: "0644"
+    content: |
+      ${indent(6, writer_go_sum)}
+
+  - path: /etc/systemd/system/writer.service
+    owner: root:root
+    permissions: "0644"
+    content: |
+      [Unit]
+      Description=Backup-lab event writer
+      After=postgresql.service
+      Requires=postgresql.service
+
+      [Service]
+      Type=simple
+      User=postgres
+      ExecStart=/usr/local/bin/writer
+      Restart=on-failure
+      RestartSec=5
+      StandardOutput=journal
+      StandardError=journal
+
+      [Install]
+      WantedBy=multi-user.target
+
+runcmd:
+  # --- Install Cloud CLI ---
+  - ${cli_install_cmd}
+
+  # --- Data disk ---
+  - mkfs.ext4 -F ${data_disk_device}
+  - mkdir -p /pgdata
+  - mount ${data_disk_device} /pgdata
+  - echo "${data_disk_device} /pgdata ext4 defaults,nofail 0 2" >> /etc/fstab
+
+  # --- Postgres: move data to /pgdata ---
+  - systemctl stop postgresql
+  - chown -R postgres:postgres /pgdata
+  - |
+    mkdir -p /pgdata/16
+    cp -a /var/lib/postgresql/16/main /pgdata/16/main
+    chown -R postgres:postgres /pgdata
+    sed -i "s|data_directory = '.*'|data_directory = '/pgdata/16/main'|" /etc/postgresql/16/main/postgresql.conf
+    sed -i "s|#listen_addresses = 'localhost'|listen_addresses = 'localhost'|" /etc/postgresql/16/main/postgresql.conf
+  - systemctl start postgresql
+
+  # --- Create database and table ---
+  - sudo -u postgres psql -c "CREATE DATABASE backuplab;"
+  - |
+    sudo -u postgres psql -d backuplab -c "
+    CREATE TABLE IF NOT EXISTS events (
+        id         BIGSERIAL    PRIMARY KEY,
+        written_at TIMESTAMPTZ  NOT NULL DEFAULT now(),
+        payload    TEXT         NOT NULL,
+        checksum   TEXT         NOT NULL
+    );"
+
+  # --- Build writer ---
+  - cd /opt/writer && GOPATH=/tmp/go GOCACHE=/tmp/go-cache GOMODCACHE=/tmp/go/pkg/mod go build -o /usr/local/bin/writer .
+
+  # --- Start writer ---
+  - systemctl daemon-reload
+  - systemctl enable writer
+  - systemctl start writer

@@ -1,0 +1,15 @@
+{
+  "cloud": "aws",
+  "session_id": "20261121T230347Z-aws",
+  "session_start": "2026-11-21T23:03:47Z",
+  "session_end": "2026-11-22T00:17:06Z",
+  "steps": {
+    "backup": {"status": "PASS", "detail": "all AWS backups completed in 1102s"},
+    "check-e": {"status": "PASS", "detail": "AWS restore test completed in 144s"},
+    "preflight": {"status": "PASS", "detail": "AWS account and budget verification complete"},
+    "drill-d": {"status": "PASS", "detail": "deletion protection verified in 25s (errors in drill-d-errors.txt)"},
+    "drill-c": {"status": "PASS", "detail": "all S3 files recovered and verified in 94s"},
+    "drill-b": {"status": "PASS", "detail": "checksums OK. rows_lost=0 (RPO gap). RTO=2751s"},
+    "drill-a": {"status": "PASS", "detail": "restored and verified. RTO=219s, data_loss=953 rows"}
+  }
+}

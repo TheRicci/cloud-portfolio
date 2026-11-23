@@ -11,10 +11,8 @@ Each project has a written requirement, a validation matrix with allowed and den
 | # | Project | Status | Cloud | Unique angle |
 |---|---|---|---|---|
 | 01 | [Hub-and-Spoke Network](./01-hub-and-spoke/) | 🔨 Building | Azure + AWS | Centrally inspected, default-deny spoke traffic |
-| 03 | [Observability and Alerting](./03-observability/) | ✅ Complete | AWS + Azure + Docker | Full-stack RED/USE metrics, Loki logs, multi-cloud alerting & chaos engineering |
-
-
-
+| 03 | [Observability and Alerting](./03-observability/) | 🔨 Building | AWS + Azure + Docker | Full-stack RED/USE metrics, Loki logs, multi-cloud alerting & chaos engineering |
+| 04 | [Backup and Restore Lab](./04-backup-and-restore/) | 🔨 Building | AWS + Azure | Multi-cloud backup and recovery drills with measured RTO/RPO |
 
 ---
 
@@ -28,22 +26,27 @@ cloud-portfolio/
 │   ├── ci/                 # Reusable GitHub Actions templates
 │   └── scripts/            # CIDR overlap checker, shared helpers
 ├── 01-hub-and-spoke/
-    ├── README.md
-    ├── azure/              # Terraform root — own state
-    ├── aws/                # Terraform root — own state
-    ├── tests/              # Test scripts
-    ├── evidence/           # Committed validation output from real sessions
-    └── docs/               # Security model, design decisions, comparisons
+│   ├── README.md
+│   ├── azure/              # Terraform root — own state
+│   ├── aws/                # Terraform root — own state
+│   ├── tests/              # Test scripts
+│   ├── evidence/           # Committed validation output from real sessions
+│   └── docs/               # Security model, design decisions, comparisons
 ├── 03-observability/
-    ├── service/             # Go workload and separate loopback-only admin listener
-    ├── compose/             # Prometheus, Alertmanager, Alloy, and k6
-    ├── aws/                 # Isolated AWS Terraform root
-    ├── azure/               # Isolated Azure Terraform root
-    ├── grafana/             # Dashboard and alert exports
-    ├── tests/               # Static gate and per-cloud session scripts
-    └── docs/                # Operational comparison notes
-
-
+│   ├── service/            # Go workload and separate loopback-only admin listener
+│   ├── compose/            # Prometheus, Alertmanager, Alloy, and k6
+│   ├── aws/                # Isolated AWS Terraform root
+│   ├── azure/              # Isolated Azure Terraform root
+│   ├── grafana/            # Dashboard and alert exports
+│   ├── tests/              # Static gate and per-cloud session scripts
+│   └── docs/               # Operational comparison notes
+├── 04-backup-and-restore/
+│   ├── README.md
+│   ├── aws/                # AWS Backup + S3 backup infrastructure
+│   ├── azure/              # Recovery Services Vault + Blob backup
+│   ├── workload/           # Target VM + Postgres + Go generator
+│   ├── docs/               # AWS and Azure deployment & drill guides
+│   └── tests/              # Automated backup and restore drills (RTO/RPO)
 ```
 
 ---
@@ -58,5 +61,3 @@ cloud-portfolio/
 - **Budget alert first** — set before any `terraform apply`
 
 ---
-
-

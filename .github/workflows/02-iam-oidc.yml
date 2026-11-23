@@ -1,0 +1,68 @@
+name: "02 — IAM & OIDC Federation Checks"
+
+on:
+  push:
+    paths:
+      - "02-iam-oidc/**"
+      - ".github/workflows/02-iam-oidc.yml"
+  pull_request:
+    paths:
+      - "02-iam-oidc/**"
+      - ".github/workflows/02-iam-oidc.yml"
+
+jobs:
+  terraform-checks:
+    name: Terraform Format & Validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~1.9"
+
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive 02-iam-oidc
+
+      - name: Validate Bootstrap AWS
+        run: |
+          terraform init -backend=false
+          terraform validate
+        working-directory: 02-iam-oidc/bootstrap/aws
+
+      - name: Validate Bootstrap Azure
+        run: |
+          terraform init -backend=false
+          terraform validate
+        working-directory: 02-iam-oidc/bootstrap/azure
+
+      - name: Validate AWS Root
+        run: |
+          terraform init -backend=false
+          terraform validate
+        working-directory: 02-iam-oidc/aws
+
+      - name: Validate Azure Root
+        run: |
+          terraform init -backend=false
+          terraform validate
+        working-directory: 02-iam-oidc/azure
+
+  security-verification:
+    name: OIDC Security Invariants & Attack Simulation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run Unified Security Test Suite & Proof Generator
+        run: python 02-iam-oidc/tests/run_tests.py
+
+      - name: Upload Verification Matrix Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: oidc-verification-proof
+          path: 02-iam-oidc/tests/results/

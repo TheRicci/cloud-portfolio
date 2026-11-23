@@ -1,0 +1,4 @@
+delete-recovery-point: DENIED — 
+aws: [ERROR]: An error occurred (AccessDeniedException) when calling the DeleteRecoveryPoint operation: User: arn:aws:sts::5633****5515:assumed-role/backup-lab-limited/drill-d-20261121T230347Z-aws is not authorized to perform: backup:DeleteRecoveryPoint on resource: arn:aws:ec2:us-east-1::image/ami-051b1adf907ba1fab with an explicit deny in an identity-based policy
+delete-backup-vault: DENIED — 
+aws: [ERROR]: An error occurred (AccessDeniedException) when calling the DeleteBackupVault operation: User: arn:aws:sts::5633****5515:assumed-role/backup-lab-limited/drill-d-20261121T230347Z-aws is not authorized to perform: backup:DeleteBackupVault on resource: arn:aws:backup:us-east-1:5633****5515:backup-vault:backup-lab-vault with an explicit deny in an identity-based policy
