@@ -1,0 +1,125 @@
+name: "02 — OIDC Showcase Workload Deploy & Destroy"
+
+on:
+  workflow_dispatch:
+    inputs:
+      cloud:
+        description: "Target Cloud to deploy"
+        required: true
+        type: choice
+        options:
+          - aws
+          - azure
+          - both
+        default: aws
+      action:
+        description: "Action to perform"
+        required: true
+        type: choice
+        options:
+          - plan
+          - apply
+          - destroy
+        default: plan
+  pull_request:
+    paths:
+      - "02-iam-oidc/workload/**"
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  aws-workload:
+    name: "AWS — ${{ github.event.inputs.action || 'plan' }}"
+    if: "${{ github.event_name == 'pull_request' || github.event.inputs.cloud == 'aws' || github.event.inputs.cloud == 'both' }}"
+    runs-on: ubuntu-latest
+    environment: "${{ (github.event.inputs.action == 'apply' || github.event.inputs.action == 'destroy') && 'aws-apply' || 'aws-plan' }}"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~1.9"
+
+      - name: Configure AWS Credentials via OIDC (Zero Stored Secrets)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: "${{ (github.event.inputs.action == 'apply' || github.event.inputs.action == 'destroy') && vars.AWS_APPLY_ROLE_ARN || vars.AWS_PLAN_ROLE_ARN }}"
+          aws-region: "${{ vars.AWS_REGION || 'us-east-1' }}"
+          role-session-name: "gh-${{ github.run_id }}"
+
+      - name: Verify Caller Identity Proof
+        run: |
+          echo "=========================================================="
+          echo "AUTHENTICATED TO AWS VIA OIDC WITH TEMPORARY SESSION TOKEN:"
+          aws sts get-caller-identity
+          echo "=========================================================="
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: 02-iam-oidc/workload/aws
+
+      - name: Terraform Plan
+        if: "${{ github.event_name == 'pull_request' || github.event.inputs.action == 'plan' }}"
+        run: terraform plan
+        working-directory: 02-iam-oidc/workload/aws
+
+      - name: Terraform Apply (Deploy Showcase VM)
+        if: "${{ github.event.inputs.action == 'apply' }}"
+        run: |
+          terraform apply -auto-approve
+          echo "Showcase VM deployed successfully via OIDC!"
+        working-directory: 02-iam-oidc/workload/aws
+
+      - name: Terraform Destroy (Teardown Showcase VM)
+        if: "${{ github.event.inputs.action == 'destroy' }}"
+        run: terraform destroy -auto-approve
+        working-directory: 02-iam-oidc/workload/aws
+
+  azure-workload:
+    name: "Azure — ${{ github.event.inputs.action || 'plan' }}"
+    if: "${{ github.event_name == 'pull_request' || github.event.inputs.cloud == 'azure' || github.event.inputs.cloud == 'both' }}"
+    runs-on: ubuntu-latest
+    environment: "${{ (github.event.inputs.action == 'apply' || github.event.inputs.action == 'destroy') && 'azure-apply' || 'azure-plan' }}"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~1.9"
+
+      - name: Log in to Azure via OIDC (Federated Token Exchange)
+        uses: azure/login@v2
+        with:
+          client-id: "${{ (github.event.inputs.action == 'apply' || github.event.inputs.action == 'destroy') && vars.AZURE_APPLY_CLIENT_ID || vars.AZURE_PLAN_CLIENT_ID }}"
+          tenant-id: "${{ vars.AZURE_TENANT_ID }}"
+          subscription-id: "${{ vars.AZURE_SUBSCRIPTION_ID }}"
+
+      - name: Verify Azure Caller Identity Proof
+        run: |
+          echo "=========================================================="
+          echo "AUTHENTICATED TO AZURE VIA OIDC FEDERATED CREDENTIAL:"
+          az account show
+          echo "=========================================================="
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: 02-iam-oidc/workload/azure
+
+      - name: Terraform Plan
+        if: "${{ github.event_name == 'pull_request' || github.event.inputs.action == 'plan' }}"
+        run: terraform plan -var="resource_group_name=${{ vars.AZURE_RESOURCE_GROUP_NAME || 'rg-portfolio-demo' }}"
+        working-directory: 02-iam-oidc/workload/azure
+
+      - name: Terraform Apply (Deploy Showcase VM)
+        if: "${{ github.event.inputs.action == 'apply' }}"
+        run: |
+          terraform apply -auto-approve -var="resource_group_name=${{ vars.AZURE_RESOURCE_GROUP_NAME || 'rg-portfolio-demo' }}"
+          echo "Showcase Azure VM deployed successfully via OIDC!"
+        working-directory: 02-iam-oidc/workload/azure
+
+      - name: Terraform Destroy (Teardown Showcase VM)
+        if: "${{ github.event.inputs.action == 'destroy' }}"
+        run: terraform destroy -auto-approve -var="resource_group_name=${{ vars.AZURE_RESOURCE_GROUP_NAME || 'rg-portfolio-demo' }}"
+        working-directory: 02-iam-oidc/workload/azure

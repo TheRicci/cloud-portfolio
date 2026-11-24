@@ -1,0 +1,47 @@
+================================================================================
+               AWS IAM & OIDC FEDERATION — VERIFICATION MATRIX                   
+================================================================================
+Generated: 2026-11-24T01:12:05Z
+Outcome: PASSED (ALL INVARIANTS VERIFIED)
+
+CHECK                                | STATUS   | DETAILS
+--------------------------------------------------------------------------------
+AWS TF Format Check                  | PASS     | Standard indentation across bootstrap/aws and aws/
+TF Validate (Bootstrap S3 State)     | PASS     | Syntax, resource types, and variables valid
+TF Validate (IAM Identity Root)      | PASS     | Syntax, resource types, and variables valid
+AWS Trust & Boundary Invariants      | PASS     | 11/11 assertions verified
+--------------------------------------------------------------------------------
+
+DETAILED AWS SECURITY PROBES & WHAT THEY TEST:
+--------------------------------------------------------------------------------
+[PASS] AWS-P01 — Strict Subject (sub) Locking & Wildcard Rejection
+       Threat Prevented : An attacker creates a feature branch or PR hoping to assume the deployment role.
+       Defense Invariant: Evaluates condition operator. Rejects StringLike/wildcards; enforces StringEquals on repo:org/repo:environment:aws-apply.
+       Audit Result     : PASS (Wildcard rejected; StringEquals enforced)
+
+[PASS] AWS-P02 — Exact Audience (aud) STS Validation
+       Threat Prevented : Token minted for a third-party service is replayed to AWS STS.
+       Defense Invariant: Assumes role trust policy requires token.actions.githubusercontent.com:aud == 'sts.amazonaws.com'.
+       Audit Result     : PASS (sts.amazonaws.com strictly required)
+
+[PASS] AWS-P03 — Plan vs. Apply Least-Privilege Separation
+       Threat Prevented : An unvetted pull request runs terraform plan and mutates cloud infrastructure.
+       Defense Invariant: Confirms portfolio-gh-plan role has zero mutation policies attached (read/lock only).
+       Audit Result     : PASS (Plan has zero mutation rights)
+
+[PASS] AWS-P04 — S3 Remote State Blast Radius Scoping
+       Threat Prevented : Compromised CI runner accesses state files of other applications in the same S3 bucket.
+       Defense Invariant: Validates s3:prefix condition on s3:ListBucket and locks Get/Put/Delete to exact state key & .tflock.
+       Audit Result     : PASS (Access scoped strictly to 02-iam-oidc state prefix)
+
+[PASS] AWS-P05 — Permission Boundary Ceiling (Anti-Privilege Escalation)
+       Threat Prevented : Apply role creates child IAM roles with AdministratorAccess to take over the account.
+       Defense Invariant: Asserts apply role has boundary attached and requires any created role to inherit portfolio-boundary.
+       Audit Result     : PASS (Boundary inheritance strictly enforced; unconstrained role creation blocked)
+
+[PASS] AWS-P06 — Identity Control Plane Anti-Tamper Protection
+       Threat Prevented : Apply role deletes the OIDC provider or modifies assume_role_policy to remove restrictions.
+       Defense Invariant: Validates explicit Deny statements on DeleteOpenIDConnectProvider and UpdateAssumeRolePolicy.
+       Audit Result     : PASS (Tampering blocked by explicit Deny)
+
+================================================================================

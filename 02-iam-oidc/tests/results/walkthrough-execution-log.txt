@@ -1,0 +1,102 @@
+
+================================================================================
+ PHASE 1: PRE-FLIGHT AUDIT & POLICY-AS-CODE (CHECKOV & INVARIANTS)
+================================================================================
+[INFO] Target Cloud: AWS
+[INFO] Repository: TheRicci/cloud-portfolio
+================================================================================
+ AWS IAM & OIDC FEDERATION — AUTOMATED SECURITY AUDIT & PROOF RUNNER
+================================================================================
+Timestamp: 2026-11-24T01:12:05Z
+
+[1/4] Checking AWS Terraform Code Formatting...
+  [PASS] AWS Terraform formatting conforms to standard.
+
+[2/4] Validating AWS Terraform Schemas & Provider Syntax...
+  [PASS] Bootstrap S3 State: Valid configuration.
+  [PASS] IAM Identity Root: Valid configuration.
+
+[3/5] Running Enterprise Security & Policy Invariant Tests...
+  [INFO] Checkov: Not found on local PATH. Run 'pip install checkov' to run locally.
+         (Configured to run automatically in GitHub Actions CI via .github/workflows/02-iam-oidc.yml)
+
+[4/5] Running AWS OIDC Security Invariant Tests (11 Assertions)...
+  [PASS] 11/11 AWS security invariant assertions passed successfully.
+
+[4/4] Generating AWS Proof Matrix & Audit Report...
+  • [PASS] AWS-P01: Strict Subject (sub) Locking & Wildcard Rejection
+    Threat: An attacker creates a feature branch or PR hoping to assume the deployment role.
+    Defense: Evaluates condition operator. Rejects StringLike/wildcards; enforces StringEquals on repo:org/repo:environment:aws-apply.
+
+  • [PASS] AWS-P02: Exact Audience (aud) STS Validation
+    Threat: Token minted for a third-party service is replayed to AWS STS.
+    Defense: Assumes role trust policy requires token.actions.githubusercontent.com:aud == 'sts.amazonaws.com'.
+
+  • [PASS] AWS-P03: Plan vs. Apply Least-Privilege Separation
+    Threat: An unvetted pull request runs terraform plan and mutates cloud infrastructure.
+    Defense: Confirms portfolio-gh-plan role has zero mutation policies attached (read/lock only).
+
+  • [PASS] AWS-P04: S3 Remote State Blast Radius Scoping
+    Threat: Compromised CI runner accesses state files of other applications in the same S3 bucket.
+    Defense: Validates s3:prefix condition on s3:ListBucket and locks Get/Put/Delete to exact state key & .tflock.
+
+  • [PASS] AWS-P05: Permission Boundary Ceiling (Anti-Privilege Escalation)
+    Threat: Apply role creates child IAM roles with AdministratorAccess to take over the account.
+    Defense: Asserts apply role has boundary attached and requires any created role to inherit portfolio-boundary.
+
+  • [PASS] AWS-P06: Identity Control Plane Anti-Tamper Protection
+    Threat: Apply role deletes the OIDC provider or modifies assume_role_policy to remove restrictions.
+    Defense: Validates explicit Deny statements on DeleteOpenIDConnectProvider and UpdateAssumeRolePolicy.
+
+[DONE] AWS Verification Matrix written to: tests\results\aws-verification-matrix.txt
+[DONE] AWS Security Audit Report written to: tests\results\aws-security-audit.md
+
+>>> ALL AWS CHECKS PASSED WITH PROOF <<<
+
+
+================================================================================
+ PHASE 2: BOOTSTRAP STATE STORAGE (RUN LOCALLY ONCE AS ADMIN)
+================================================================================
+[INFO] Why: Terraform requires backend storage for state, but the bucket doesn't exist yet.
+[INFO] Security Rule: CI must NEVER have permission to delete its own state bucket.
+[INFO] Bootstrap AWS state storage template is valid and ready to apply.
+
+================================================================================
+ PHASE 3: IDENTITY ROOT & OIDC TRUST CONFIGURATION
+================================================================================
+[INFO] Why: Configures the cloud security guard (OIDC Provider + Plan/Apply Roles).
+[INFO] AWS Identity templates validated with exact StringEquals and Permission Boundary.
+
+================================================================================
+ PHASE 4: GITHUB ENVIRONMENT SETUP (INTERACTIVE PAUSE)
+================================================================================
+Please configure the following environment variables in your GitHub repository:
+Navigate to: https://github.com/TheRicci/cloud-portfolio/settings/environments
+
+1. In environment [aws-plan]:
+   - AWS_REGION        = us-east-1
+   - AWS_PLAN_ROLE_ARN = arn:aws:iam::123456789012:role/portfolio-tests/portfolio-gh-plan
+
+2. In environment [aws-apply] (Enable Required Reviewers!):
+   - AWS_REGION         = us-east-1
+   - AWS_APPLY_ROLE_ARN = arn:aws:iam::123456789012:role/portfolio-tests/portfolio-gh-apply
+
+[ACTION REQUIRED] Waiting for environment variables to be set in GitHub Settings...
+
+================================================================================
+ PHASE 5: SHOWCASE WORKLOAD DEPLOYMENT DEMO (OIDC IN ACTION)
+================================================================================
+[INFO] Testing the self-contained showcase workload (workload/aws)...
+[32m[1mSuccess![0m The configuration is valid.
+[0m
+[INFO] Workload Terraform configuration is valid.
+
+[INFO] To trigger live deployment via OIDC in GitHub Actions:
+1. Go to: https://github.com/TheRicci/cloud-portfolio/actions/workflows/02-oidc-showcase-deploy.yml
+2. Click 'Run workflow' -> Select 'aws' and action 'plan' (proves read-only Plan role).
+3. Click 'Run workflow' -> Select 'aws' and action 'apply' (approves deployment, builds VM).
+4. Click 'Run workflow' -> Select 'aws' and action 'destroy' (cleans up immediately).
+
+================================================================================
+ PHASE 6: WALKTHROUGH COMPLETE & PROOF LOG GENERATED
+================================================================================

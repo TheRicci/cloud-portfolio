@@ -1,0 +1,7 @@
+github_subject_plan  = "repo:OWNER/REPOSITORY:environment:azure-plan"
+github_subject_apply = "repo:OWNER/REPOSITORY:environment:azure-apply"
+
+# Copy this from `az group show --name <project-rg> --query id -o tsv`.
+deployment_resource_group_id = "/subscriptions/SUBSCRIPTION_ID/resourceGroups/rg-portfolio-projects"
+state_resource_group_name    = "rg-tfstate-portfolio"
+state_storage_account_name   = "replacewithbootstrapstorage"

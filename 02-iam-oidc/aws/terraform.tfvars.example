@@ -1,0 +1,4 @@
+region              = "us-east-1"
+state_bucket_name   = "replace-with-the-bootstrap-bucket"
+github_subject_plan = "repo:OWNER/REPOSITORY:environment:aws-plan"
+github_subject_apply = "repo:OWNER/REPOSITORY:environment:aws-apply"

@@ -1,0 +1,34 @@
+# Checkov Configuration for 02-iam-oidc
+# Industry-standard IaC static security analysis by Bridgecrew / Palo Alto Networks
+
+framework:
+  - terraform
+
+directory:
+  - aws
+  - azure
+  - bootstrap/aws
+  - bootstrap/azure
+  - workload/aws
+  - workload/azure
+
+# Specific OIDC, IAM, and Storage Security Checks:
+# CKV_AWS_358: Ensure IAM OIDC identity provider trust policy conditions have sub and aud claims
+# CKV_AWS_1:   Ensure IAM policies do not allow full '*:*' administrative privileges
+# CKV_AWS_62:  Ensure IAM policies do not allow wildcard actions
+# CKV_AWS_19:  Ensure S3 bucket has encryption enabled
+# CKV_AWS_21:  Ensure S3 bucket has versioning enabled
+# CKV_AZURE_3: Ensure storage accounts disallow public access
+# CKV_AZURE_44: Ensure Storage Account uses minimum TLS version 1.2
+check:
+  - CKV_AWS_358
+  - CKV_AWS_1
+  - CKV_AWS_62
+  - CKV_AWS_19
+  - CKV_AWS_21
+  - CKV_AZURE_3
+  - CKV_AZURE_44
+
+compact: true
+quiet: false
+soft-fail: false

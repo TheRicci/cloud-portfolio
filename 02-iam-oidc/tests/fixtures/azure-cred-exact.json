@@ -1,0 +1,8 @@
+{
+  "name": "github-azure-apply",
+  "issuer": "https://token.actions.githubusercontent.com",
+  "subject": "repo:OWNER/REPOSITORY:environment:azure-apply",
+  "audiences": [
+    "api://AzureADTokenExchange"
+  ]
+}

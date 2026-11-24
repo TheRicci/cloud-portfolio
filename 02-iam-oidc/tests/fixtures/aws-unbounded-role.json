@@ -1,0 +1,5 @@
+{
+  "Action": "iam:CreateRole",
+  "RoleName": "backdoor-admin",
+  "PermissionsBoundary": null
+}

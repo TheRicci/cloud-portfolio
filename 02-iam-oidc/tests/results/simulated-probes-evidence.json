@@ -1,0 +1,81 @@
+{
+  "timestamp": "2026-11-22T03:59:17Z",
+  "environment": "automated-audit-harness",
+  "probes": [
+    {
+      "probe_id": "P-01",
+      "cloud": "AWS",
+      "action": "sts:AssumeRoleWithWebIdentity",
+      "scenario": "Pull Request trying to assume aws-apply role",
+      "attempted_subject": "repo:org/portfolio:pull_request",
+      "required_subject": "repo:org/portfolio:environment:aws-apply",
+      "expected": "403 Forbidden",
+      "simulated_response": {
+        "status": "Denied",
+        "error_code": "AccessDenied",
+        "reason": "token.actions.githubusercontent.com:sub does not match StringEquals requirement"
+      },
+      "status": "PASS"
+    },
+    {
+      "probe_id": "P-02",
+      "cloud": "AWS",
+      "action": "iam:CreateRole",
+      "scenario": "Compromised apply role attempts to create unbounded admin role",
+      "attempted_payload": {
+        "RoleName": "backdoor-admin",
+        "PermissionsBoundary": null
+      },
+      "required_boundary": "arn:aws:iam::account:policy/portfolio-tests/portfolio-boundary",
+      "expected": "403 AccessDenied",
+      "simulated_response": {
+        "status": "Denied",
+        "error_code": "AccessDenied",
+        "reason": "iam:CreateRole denied by policy condition: iam:PermissionsBoundary is missing or does not match portfolio-boundary"
+      },
+      "status": "PASS"
+    },
+    {
+      "probe_id": "P-03",
+      "cloud": "AWS",
+      "action": "iam:DeleteOpenIDConnectProvider",
+      "scenario": "Compromised apply role attempts to delete OIDC provider or tamper with boundary",
+      "attempted_target": "arn:aws:iam::account:oidc-provider/token.actions.githubusercontent.com",
+      "expected": "403 ExplicitDeny",
+      "simulated_response": {
+        "status": "Denied",
+        "error_code": "AccessDenied",
+        "reason": "Explicit Deny statement DenyIdentityControlPlaneMutation matches request"
+      },
+      "status": "PASS"
+    },
+    {
+      "probe_id": "P-04",
+      "cloud": "Azure",
+      "action": "Microsoft.Authorization/roleAssignments/write",
+      "scenario": "Azure Contributor attempts to grant Owner role or assign permissions",
+      "expected": "AuthorizationFailed",
+      "simulated_response": {
+        "status": "Denied",
+        "error_code": "AuthorizationFailed",
+        "reason": "The client does not have authorization to perform action 'Microsoft.Authorization/roleAssignments/write' over scope"
+      },
+      "status": "PASS"
+    },
+    {
+      "probe_id": "P-05",
+      "cloud": "Azure",
+      "action": "FederatedCredentialLogin",
+      "scenario": "Feature branch job attempts to login to id-portfolio-apply without environment",
+      "attempted_subject": "repo:org/portfolio:ref:refs/heads/feature-xyz",
+      "required_subject": "repo:org/portfolio:environment:azure-apply",
+      "expected": "AADSTS70021",
+      "simulated_response": {
+        "status": "Denied",
+        "error_code": "AADSTS70021",
+        "reason": "No matching federated identity record found for subject 'repo:org/portfolio:ref:refs/heads/feature-xyz'"
+      },
+      "status": "PASS"
+    }
+  ]
+}

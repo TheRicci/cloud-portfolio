@@ -11,7 +11,8 @@ Each project has a written requirement, a validation matrix with allowed and den
 | # | Project | Status | Cloud | Unique angle |
 |---|---|---|---|---|
 | 01 | [Hub-and-Spoke Network](./01-hub-and-spoke/) | 🔨 Building | Azure + AWS | Centrally inspected, default-deny spoke traffic |
-| 03 | [Observability and Alerting](./03-observability/) | 🔨 Building | AWS + Azure + Docker | Full-stack RED/USE metrics, Loki logs, multi-cloud alerting & chaos engineering |
+| 02 | [IAM & OIDC Federation](./02-iam-oidc/) | 🔨 Building | AWS + Azure | Zero long-lived credentials, Checkov enterprise scanning, 6-phase walkthrough & showcase VM |
+| 03 | [Observability and Alerting](./03-observability/) | 🔨 Building | AWS + Azure + Docker | Full-stack RED/USE metrics, Loki logs, multi-cloud alerting, Grafana & Prometheus |
 | 04 | [Backup and Restore Lab](./04-backup-and-restore/) | 🔨 Building | AWS + Azure | Multi-cloud backup and recovery drills with measured RTO/RPO |
 
 ---
@@ -32,6 +33,16 @@ cloud-portfolio/
 │   ├── tests/              # Test scripts
 │   ├── evidence/           # Committed validation output from real sessions
 │   └── docs/               # Security model, design decisions, comparisons
+├── 02-iam-oidc/
+│   ├── README.md
+│   ├── .checkov.yaml       # Checkov enterprise IaC scanner configuration
+│   ├── demo-walkthrough.sh # 6-phase interactive walkthrough & automation harness
+│   ├── bootstrap/          # One-time local state-backend setup (S3 / Blob)
+│   ├── aws/                # AWS OIDC provider, plan/apply roles, boundary
+│   ├── azure/              # Entra apps, federated credentials, scoped RBAC
+│   ├── workload/           # Self-contained showcase VM workload (AWS + Azure)
+│   ├── tests/              # Security invariant tests & recorded proof logs
+│   └── docs/               # In-depth walkthrough guide, activation & comparisons
 ├── 03-observability/
 │   ├── service/            # Go workload and separate loopback-only admin listener
 │   ├── compose/            # Prometheus, Alertmanager, Alloy, and k6
@@ -55,7 +66,7 @@ cloud-portfolio/
 
 - **Terraform only** — no console clicks, no manual state
 - **Remote state** — Azure Storage or S3 with locking, never local
-- **OIDC federation** — no long-lived cloud credentials committed
+- **OIDC federation** — no long-lived cloud credentials committed ([02-iam-oidc](./02-iam-oidc/))
 - **Evidence committed** — plain-text validation output saved before `terraform destroy`
 - **Destroy after every session** — hourly-billed resources never left running
 - **Budget alert first** — set before any `terraform apply`

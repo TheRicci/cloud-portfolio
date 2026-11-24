@@ -1,0 +1,11 @@
+# Bootstrap state exists only until it is migrated to the newly created backend.
+bootstrap/**/terraform.tfstate
+bootstrap/**/terraform.tfstate.*
+
+# Terraform local data
+**/.terraform/
+**/*.tfstate
+**/*.tfstate.*
+**/*.tfvars
+**/*.tfvars.json
+**/*.tfplan

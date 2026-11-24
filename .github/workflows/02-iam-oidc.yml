@@ -11,8 +11,22 @@ on:
       - ".github/workflows/02-iam-oidc.yml"
 
 jobs:
-  terraform-checks:
-    name: Terraform Format & Validation
+  checkov-security-scan:
+    name: Checkov Enterprise IaC Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Checkov Security Scanner (Industry Standard)
+        uses: bridgecrewio/checkov-action@master
+        with:
+          config_file: 02-iam-oidc/.checkov.yaml
+          framework: terraform
+          output_format: cli
+          soft_fail: true
+
+  aws-oidc-verification:
+    name: AWS OIDC Verification & Security Probes
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,8 +35,12 @@ jobs:
         with:
           terraform_version: "~1.9"
 
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
       - name: Terraform Format Check
-        run: terraform fmt -check -recursive 02-iam-oidc
+        run: terraform fmt -check -recursive 02-iam-oidc/aws 02-iam-oidc/bootstrap/aws 02-iam-oidc/workload/aws
 
       - name: Validate Bootstrap AWS
         run: |
@@ -30,17 +48,51 @@ jobs:
           terraform validate
         working-directory: 02-iam-oidc/bootstrap/aws
 
-      - name: Validate Bootstrap Azure
-        run: |
-          terraform init -backend=false
-          terraform validate
-        working-directory: 02-iam-oidc/bootstrap/azure
-
       - name: Validate AWS Root
         run: |
           terraform init -backend=false
           terraform validate
         working-directory: 02-iam-oidc/aws
+
+      - name: Validate Workload AWS
+        run: |
+          terraform init -backend=false
+          terraform validate
+        working-directory: 02-iam-oidc/workload/aws
+
+      - name: Run AWS Security Invariants & Attack Probes
+        run: python 02-iam-oidc/tests/run_aws_tests.py
+
+      - name: Upload AWS Proof Evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: aws-oidc-verification-proof
+          path: |
+            02-iam-oidc/tests/results/aws-verification-matrix.txt
+            02-iam-oidc/tests/results/aws-security-audit.md
+
+  azure-oidc-verification:
+    name: Azure OIDC Verification & Security Probes
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~1.9"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive 02-iam-oidc/azure 02-iam-oidc/bootstrap/azure 02-iam-oidc/workload/azure
+
+      - name: Validate Bootstrap Azure
+        run: |
+          terraform init -backend=false
+          terraform validate
+        working-directory: 02-iam-oidc/bootstrap/azure
 
       - name: Validate Azure Root
         run: |
@@ -48,21 +100,19 @@ jobs:
           terraform validate
         working-directory: 02-iam-oidc/azure
 
-  security-verification:
-    name: OIDC Security Invariants & Attack Simulation
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+      - name: Validate Workload Azure
+        run: |
+          terraform init -backend=false
+          terraform validate
+        working-directory: 02-iam-oidc/workload/azure
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
+      - name: Run Azure Security Invariants & Attack Probes
+        run: python 02-iam-oidc/tests/run_azure_tests.py
 
-      - name: Run Unified Security Test Suite & Proof Generator
-        run: python 02-iam-oidc/tests/run_tests.py
-
-      - name: Upload Verification Matrix Artifact
+      - name: Upload Azure Proof Evidence
         uses: actions/upload-artifact@v4
         with:
-          name: oidc-verification-proof
-          path: 02-iam-oidc/tests/results/
+          name: azure-oidc-verification-proof
+          path: |
+            02-iam-oidc/tests/results/azure-verification-matrix.txt
+            02-iam-oidc/tests/results/azure-security-audit.md

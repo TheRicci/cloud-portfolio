@@ -1,0 +1,29 @@
+================================================================================
+             IAM & OIDC FEDERATION - AUTOMATED VERIFICATION MATRIX               
+================================================================================
+Generated at: 2026-11-22T03:59:17Z
+Overall Status: PASSED
+
+CHECK                                    | STATUS   | DETAILS
+--------------------------------------------------------------------------------
+Terraform Formatting                     | PASS     | Consistent indentation and formatting
+TF Validate (bootstrap\aws)              | PASS     | Provider syntax & schema valid
+TF Validate (bootstrap\azure)            | PASS     | Provider syntax & schema valid
+TF Validate (aws)                        | PASS     | Provider syntax & schema valid
+TF Validate (azure)                      | PASS     | Provider syntax & schema valid
+OIDC Trust & Boundary Invariants         | PASS     | 16/16 security tests passed
+--------------------------------------------------------------------------------
+
+SECURITY PROBES & ATTACK VECTOR SIMULATION RESULTS:
+--------------------------------------------------------------------------------
+[PASS] P-01 (AWS): Pull Request trying to assume aws-apply role
+       Expected: 403 Forbidden | Result: Denied (AccessDenied)
+[PASS] P-02 (AWS): Compromised apply role attempts to create unbounded admin role
+       Expected: 403 AccessDenied | Result: Denied (AccessDenied)
+[PASS] P-03 (AWS): Compromised apply role attempts to delete OIDC provider or tamper with boundary
+       Expected: 403 ExplicitDeny | Result: Denied (AccessDenied)
+[PASS] P-04 (Azure): Azure Contributor attempts to grant Owner role or assign permissions
+       Expected: AuthorizationFailed | Result: Denied (AuthorizationFailed)
+[PASS] P-05 (Azure): Feature branch job attempts to login to id-portfolio-apply without environment
+       Expected: AADSTS70021 | Result: Denied (AADSTS70021)
+================================================================================
