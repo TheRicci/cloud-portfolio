@@ -1,0 +1,15 @@
+---
+- name: Write audit rules
+  ansible.builtin.template:
+    src: audit.rules.j2
+    dest: /etc/audit/rules.d/99-hardening.rules
+    owner: root
+    group: root
+    mode: "0640"
+  notify: Load audit rules
+
+- name: Enable the audit daemon
+  ansible.builtin.service:
+    name: auditd
+    state: started
+    enabled: true

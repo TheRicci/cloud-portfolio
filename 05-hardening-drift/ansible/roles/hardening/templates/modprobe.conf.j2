@@ -1,0 +1,4 @@
+# Managed by Ansible.
+{% for module in hardening_blacklisted_modules %}
+install {{ module }} /bin/true
+{% endfor %}

@@ -1,0 +1,13 @@
+ssh_root_login_disabled fail
+ssh_password_auth_disabled fail
+ssh_keyboard_interactive_disabled pass
+ssh_x11_forwarding_disabled fail
+ssh_max_auth_tries_low fail
+no_unexpected_login_users pass
+firewall_active fail
+firewall_default_deny fail
+ip_forwarding_off pass
+reverse_path_filter_on fail
+syn_cookies_on pass
+auditd_running fail
+shadow_file_mode_640 pass

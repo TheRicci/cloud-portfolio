@@ -1,8 +1,6 @@
 # cloud-portfolio
 
-Infrastructure projects across AWS and Azure — built to demonstrate production patterns, not tutorials.
-
-Each project has a written requirement, a validation matrix with allowed and denied paths, evidence from a real deployment, and a cost breakdown. Infrastructure is the focus; a minimal test workload is used when it makes a network assertion real.
+Infrastructure projects across AWS and Azure — built to demonstrate production patterns.
 
 ---
 
@@ -14,6 +12,7 @@ Each project has a written requirement, a validation matrix with allowed and den
 | 02 | [IAM & OIDC Federation](./02-iam-oidc/) | 🔨 Building | AWS + Azure | Zero long-lived credentials, Checkov enterprise scanning, 6-phase walkthrough & showcase VM |
 | 03 | [Observability and Alerting](./03-observability/) | 🔨 Building | AWS + Azure + Docker | Full-stack RED/USE metrics, Loki logs, multi-cloud alerting, Grafana & Prometheus |
 | 04 | [Backup and Restore Lab](./04-backup-and-restore/) | 🔨 Building | AWS + Azure | Multi-cloud backup and recovery drills with measured RTO/RPO |
+| 05 | [Hardening and Drift](./05-hardening-drift/) | 🔨 Building | AWS + Azure | Pull-mode Ansible OS hardening, Lynis before/after scoring, external probes & timed self-repair |
 
 ---
 
@@ -58,6 +57,15 @@ cloud-portfolio/
 │   ├── workload/           # Target VM + Postgres + Go generator
 │   ├── docs/               # AWS and Azure deployment & drill guides
 │   └── tests/              # Automated backup and restore drills (RTO/RPO)
+└── 05-hardening-drift/
+    ├── README.md
+    ├── ansible/            # local.yml, hardening role, pull wrapper & systemd timer
+    ├── common/             # Shared cloud-init bootstrap (weak baseline, decoy, bundle)
+    ├── aws/                # Isolated AWS Terraform root
+    ├── azure/              # Isolated Azure Terraform root
+    ├── tests/              # Session runner, outside probes, on-VM checks & results
+    ├── ci/                 # Static-check workflow template
+    └── docs/               # AWS vs Azure measured results comparison
 ```
 
 ---
@@ -65,10 +73,7 @@ cloud-portfolio/
 ## Standards (applied to every project)
 
 - **Terraform only** — no console clicks, no manual state
-- **Remote state** — Azure Storage or S3 with locking, never local
-- **OIDC federation** — no long-lived cloud credentials committed ([02-iam-oidc](./02-iam-oidc/))
 - **Evidence committed** — plain-text validation output saved before `terraform destroy`
 - **Destroy after every session** — hourly-billed resources never left running
-- **Budget alert first** — set before any `terraform apply`
 
 ---

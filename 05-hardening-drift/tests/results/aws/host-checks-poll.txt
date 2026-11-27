@@ -1,0 +1,13 @@
+ssh_root_login_disabled pass
+ssh_password_auth_disabled pass
+ssh_keyboard_interactive_disabled pass
+ssh_x11_forwarding_disabled pass
+ssh_max_auth_tries_low pass
+no_unexpected_login_users pass
+firewall_active pass
+firewall_default_deny pass
+ip_forwarding_off pass
+reverse_path_filter_on pass
+syn_cookies_on pass
+auditd_running pass
+shadow_file_mode_640 pass

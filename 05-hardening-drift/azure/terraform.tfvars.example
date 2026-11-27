@@ -1,0 +1,4 @@
+# The session script passes these as TF_VAR_* values, so this file is optional.
+# Never put keys, account IDs or subscription IDs here.
+region     = "eastus"
+session_id = "s1"

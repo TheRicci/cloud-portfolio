@@ -1,0 +1,39 @@
+● hardening-pull.timer - Re-apply the hardening playbook on a schedule
+     Loaded: loaded (/etc/systemd/system/hardening-pull.timer; enabled; preset: enabled)
+    Drop-In: /etc/systemd/system/hardening-pull.timer.d
+             └─interval.conf
+     Active: active (elapsed) since Wed 2026-11-25 19:32:33 UTC; 11min ago
+    Trigger: n/a
+   Triggers: ● hardening-pull.service
+
+Nov 25 19:32:33 ip-10-77-0-115 systemd[1]: Started hardening-pull.timer - Re-apply the hardening playbook on a schedule.
+
+○ hardening-pull.service - Pull the pinned commit and apply the hardening playbook
+     Loaded: loaded (/etc/systemd/system/hardening-pull.service; static)
+     Active: inactive (dead)
+TriggeredBy: ● hardening-pull.timer
+---
+NEXT                            LEFT LAST                              PASSED UNIT                           ACTIVATES
+Wed 2026-11-25 19:50:00 UTC     6min Wed 2026-11-25 19:40:02 UTC 3min 37s ago sysstat-collect.timer          sysstat-collect.service
+Wed 2026-11-25 20:11:35 UTC    27min -                                      - fwupd-refresh.timer            fwupd-refresh.service
+Thu 2026-11-26 00:00:00 UTC 4h 16min -                                      - dpkg-db-backup.timer           dpkg-db-backup.service
+Thu 2026-11-26 00:00:00 UTC 4h 16min -                                      - logrotate.timer                logrotate.service
+Thu 2026-11-26 00:07:00 UTC 4h 23min -                                      - sysstat-summary.timer          sysstat-summary.service
+Thu 2026-11-26 00:14:49 UTC 4h 31min -                                      - lynis.timer                    lynis.service
+Thu 2026-11-26 01:50:20 UTC       6h -                                      - motd-news.timer                motd-news.service
+Thu 2026-11-26 03:48:03 UTC       8h -                                      - man-db.timer                   man-db.service
+Thu 2026-11-26 06:12:56 UTC      10h -                                      - apt-daily-upgrade.timer        apt-daily-upgrade.service
+Thu 2026-11-26 10:41:16 UTC      14h -                                      - apt-daily.timer                apt-daily.service
+Thu 2026-11-26 19:32:36 UTC      23h Wed 2026-11-25 19:32:36 UTC    11min ago update-notifier-download.timer update-notifier-download.service
+Thu 2026-11-26 19:42:39 UTC      23h Wed 2026-11-25 19:42:39 UTC  1min 1s ago systemd-tmpfiles-clean.timer   systemd-tmpfiles-clean.service
+Sun 2026-11-29 03:10:58 UTC   3 days -                                      - e2scrub_all.timer              e2scrub_all.service
+Mon 2026-11-30 00:31:22 UTC   4 days -                                      - fstrim.timer                   fstrim.service
+Mon 2026-11-30 06:39:08 UTC   4 days -                                      - update-notifier-motd.timer     update-notifier-motd.service
+-                                  - -                                      - apport-autoreport.timer        apport-autoreport.service
+-                                  - -                                      - hardening-pull.timer           hardening-pull.service
+-                                  - -                                      - snapd.snap-repair.timer        snapd.snap-repair.service
+-                                  - -                                      - ua-timer.timer                 ua-timer.service
+
+19 timers listed.
+---
+Nov 25 19:32:33 ip-10-77-0-115 systemd[1]: Started hardening-pull.timer - Re-apply the hardening playbook on a schedule.

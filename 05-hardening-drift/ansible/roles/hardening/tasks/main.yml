@@ -1,0 +1,32 @@
+---
+- name: Install packages
+  ansible.builtin.import_tasks: packages.yml
+  tags: [packages]
+
+- name: Harden SSH
+  ansible.builtin.import_tasks: ssh.yml
+  tags: [ssh]
+
+- name: Control login users
+  ansible.builtin.import_tasks: users.yml
+  tags: [users]
+
+- name: Configure the host firewall
+  ansible.builtin.import_tasks: firewall.yml
+  tags: [firewall]
+
+- name: Apply kernel settings
+  ansible.builtin.import_tasks: sysctl.yml
+  tags: [sysctl]
+
+- name: Configure auditing
+  ansible.builtin.import_tasks: audit.yml
+  tags: [audit]
+
+- name: Enable automatic updates
+  ansible.builtin.import_tasks: updates.yml
+  tags: [updates]
+
+- name: Tighten files, modules and limits
+  ansible.builtin.import_tasks: misc.yml
+  tags: [misc]

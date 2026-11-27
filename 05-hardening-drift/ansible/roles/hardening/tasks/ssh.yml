@@ -1,0 +1,34 @@
+---
+- name: Write the login banner
+  ansible.builtin.copy:
+    dest: /etc/issue.net
+    content: "{{ hardening_login_banner }}\n"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Remove the lab baseline SSH drop-in
+  ansible.builtin.file:
+    path: /etc/ssh/sshd_config.d/10-lab-baseline.conf
+    state: absent
+  notify: Reload sshd
+
+- name: Write the hardened SSH drop-in
+  ansible.builtin.template:
+    src: 00-hardening.conf.j2
+    dest: /etc/ssh/sshd_config.d/00-hardening.conf
+    owner: root
+    group: root
+    mode: "0644"
+    validate: /usr/sbin/sshd -t -f %s
+  notify: Reload sshd
+
+- name: Restrict permissions on the main SSH config
+  ansible.builtin.file:
+    path: /etc/ssh/sshd_config
+    owner: root
+    group: root
+    mode: "0600"
+
+- name: Apply SSH changes now
+  ansible.builtin.meta: flush_handlers

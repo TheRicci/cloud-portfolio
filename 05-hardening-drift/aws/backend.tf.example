@@ -1,0 +1,9 @@
+# Copy to backend.tf and fill in. Use a remote, encrypted backend, never local state.
+terraform {
+  backend "s3" {
+    bucket  = "<your-state-bucket>"
+    key     = "hardening-drift/aws.tfstate"
+    region  = "<state-bucket-region>"
+    encrypt = true
+  }
+}

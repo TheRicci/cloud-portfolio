@@ -1,0 +1,9 @@
+---
+# Run on the host itself by ansible-pull. Re-running it must change nothing.
+- name: Harden this host and keep it hardened
+  hosts: localhost
+  connection: local
+  become: true
+  gather_facts: true
+  roles:
+    - hardening

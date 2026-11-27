@@ -1,0 +1,45 @@
+# Copy to .github/workflows/ in the repository root. Static checks only: it never touches a cloud.
+name: hardening-drift static checks
+
+on:
+  pull_request:
+    paths:
+      - "hardening-drift/**"
+  push:
+    branches: [main]
+    paths:
+      - "hardening-drift/**"
+
+jobs:
+  static:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: hardening-drift
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install ansible-core ansible-lint shellcheck-py yamllint
+      - name: Install Ansible collections
+        run: ansible-galaxy collection install -r ansible/requirements.yml
+      - name: Playbook syntax check
+        run: ansible-playbook --syntax-check -i localhost, ansible/local.yml
+      - name: Ansible lint
+        run: ansible-lint ansible
+      - name: YAML lint
+        run: yamllint -s ansible/ common/cloud-init.yaml.tftpl
+      - name: Shell scripts
+        run: shellcheck -x -P SCRIPTDIR tests/*.sh tests/remote/*.sh ansible/files/hardening-pull
+      - uses: hashicorp/setup-terraform@v3
+      - name: Terraform format
+        run: terraform fmt -check -recursive
+      - name: Terraform validate (AWS)
+        run: |
+          terraform -chdir=aws init -backend=false
+          terraform -chdir=aws validate
+      - name: Terraform validate (Azure)
+        run: |
+          terraform -chdir=azure init -backend=false
+          terraform -chdir=azure validate

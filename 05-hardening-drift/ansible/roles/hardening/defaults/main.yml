@@ -1,0 +1,51 @@
+---
+# Accounts that may log in. Any other account with a normal UID and a login
+# shell is removed on every run.
+hardening_allowed_login_users:
+  - ubuntu
+  - azureuser
+
+hardening_nologin_shells:
+  - /usr/sbin/nologin
+  - /sbin/nologin
+  - /bin/false
+
+hardening_ssh_max_auth_tries: 3
+hardening_ssh_banner: /etc/issue.net
+hardening_login_banner: "Authorized use only. Activity is logged."
+
+hardening_packages:
+  - auditd
+  - ufw
+  - unattended-upgrades
+  - libpam-pwquality
+  - debsums
+  - apt-listchanges
+
+hardening_sysctl:
+  net.ipv4.ip_forward: "0"
+  net.ipv4.conf.all.rp_filter: "1"
+  net.ipv4.conf.default.rp_filter: "1"
+  net.ipv4.conf.all.accept_redirects: "0"
+  net.ipv4.conf.default.accept_redirects: "0"
+  net.ipv4.conf.all.send_redirects: "0"
+  net.ipv4.conf.all.accept_source_route: "0"
+  net.ipv4.tcp_syncookies: "1"
+  net.ipv4.icmp_echo_ignore_broadcasts: "1"
+  kernel.randomize_va_space: "2"
+  kernel.kptr_restrict: "2"
+  kernel.dmesg_restrict: "1"
+  fs.suid_dumpable: "0"
+
+hardening_blacklisted_modules:
+  - cramfs
+  - freevxfs
+  - hfs
+  - hfsplus
+  - udf
+
+hardening_file_modes:
+  - { path: /etc/passwd, owner: root, group: root, mode: "0644" }
+  - { path: /etc/group, owner: root, group: root, mode: "0644" }
+  - { path: /etc/shadow, owner: root, group: shadow, mode: "0640" }
+  - { path: /etc/gshadow, owner: root, group: shadow, mode: "0640" }

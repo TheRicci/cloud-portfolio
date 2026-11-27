@@ -1,0 +1,4 @@
+control_ssh_reachable pass
+# offered_methods=publickey
+ssh_password_auth_not_offered pass
+decoy_port_8080_closed pass

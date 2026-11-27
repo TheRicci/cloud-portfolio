@@ -1,0 +1,24 @@
+---
+- name: Read the user database
+  ansible.builtin.getent:
+    database: passwd
+    split: ":"
+
+- name: Remove login users that are not on the allowed list
+  ansible.builtin.user:
+    name: "{{ item.key }}"
+    state: absent
+    remove: true
+  loop: "{{ getent_passwd | dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
+  when:
+    - item.value[1] | int >= 1000
+    - item.key != 'nobody'
+    - item.key not in hardening_allowed_login_users
+    - item.value[5] not in hardening_nologin_shells
+
+- name: Lock the root password
+  ansible.builtin.user:
+    name: root
+    password_lock: true

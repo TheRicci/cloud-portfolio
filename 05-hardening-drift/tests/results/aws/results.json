@@ -1,0 +1,40 @@
+{
+  "meta": {
+    "cloud": "aws",
+    "session_id": "s11251830",
+    "commit": "8e975a119d2d0c1ca299384597cb1b2eeab6333a",
+    "region": "us-east-1",
+    "started_utc": "2026-11-25T21:30:03Z",
+    "pull_interval_min": 3
+  },
+  "baseline": {
+    "host_checks_failed": 8,
+    "outside_checks_failed": 2,
+    "lynis_index": "58"
+  },
+  "hardened": {
+    "host_checks_failed": 0,
+    "outside_checks_failed": 0,
+    "lynis_index": "70"
+  },
+  "apply": {
+    "first_run_seconds": 40,
+    "first_run_changed": "14",
+    "second_run_changed": "0"
+  },
+  "drift": {
+    "healed": true,
+    "heal_seconds": 20,
+    "checks_failing_after_break": "5"
+  },
+  "final": {
+    "host_checks_failed": 0,
+    "outside_checks_failed": 0,
+    "lynis_index": "70"
+  },
+  "session": {
+    "failures": 0,
+    "elapsed_seconds": 433,
+    "passed": true
+  }
+}

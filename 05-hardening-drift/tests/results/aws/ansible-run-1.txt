@@ -1,0 +1,142 @@
+[WARNING]: Could not match supplied host pattern, ignoring: ip-10-77-0-118
+[WARNING]: Could not match supplied host pattern, ignoring:
+ip-10-77-0-118.ec2.internal
+[WARNING]: Ignoring depth argument. Shallow clones are only available for HEAD,
+branches, tags or in combination with refspec.
+localhost | CHANGED => {
+    "after": "9034f0a17e951e92a927ba57987a7e04e870269f",
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python3"
+    },
+    "before": null,
+    "changed": true
+}
+[WARNING]: Could not match supplied host pattern, ignoring: ip-10-77-0-118
+[WARNING]: Could not match supplied host pattern, ignoring:
+ip-10-77-0-118.ec2.internal
+
+PLAY [Harden this host and keep it hardened] ***********************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [localhost]
+
+TASK [hardening : Install hardening packages] **********************************
+changed: [localhost]
+
+TASK [hardening : Write the login banner] **************************************
+changed: [localhost]
+
+TASK [hardening : Remove the lab baseline SSH drop-in] *************************
+changed: [localhost]
+
+TASK [hardening : Write the hardened SSH drop-in] ******************************
+changed: [localhost]
+
+TASK [hardening : Restrict permissions on the main SSH config] *****************
+changed: [localhost]
+
+TASK [hardening : Apply SSH changes now] ***************************************
+
+RUNNING HANDLER [hardening : Reload sshd] **************************************
+changed: [localhost]
+
+TASK [hardening : Read the user database] **************************************
+ok: [localhost]
+
+TASK [hardening : Remove login users that are not on the allowed list] *********
+skipping: [localhost] => (item=root) 
+skipping: [localhost] => (item=daemon) 
+skipping: [localhost] => (item=bin) 
+skipping: [localhost] => (item=sys) 
+skipping: [localhost] => (item=sync) 
+skipping: [localhost] => (item=games) 
+skipping: [localhost] => (item=man) 
+skipping: [localhost] => (item=lp) 
+skipping: [localhost] => (item=mail) 
+skipping: [localhost] => (item=news) 
+skipping: [localhost] => (item=uucp) 
+skipping: [localhost] => (item=proxy) 
+skipping: [localhost] => (item=www-data) 
+skipping: [localhost] => (item=backup) 
+skipping: [localhost] => (item=list) 
+skipping: [localhost] => (item=irc) 
+skipping: [localhost] => (item=_apt) 
+skipping: [localhost] => (item=nobody) 
+skipping: [localhost] => (item=systemd-network) 
+skipping: [localhost] => (item=systemd-timesync) 
+skipping: [localhost] => (item=dhcpcd) 
+skipping: [localhost] => (item=messagebus) 
+skipping: [localhost] => (item=syslog) 
+skipping: [localhost] => (item=systemd-resolve) 
+skipping: [localhost] => (item=uuidd) 
+skipping: [localhost] => (item=tss) 
+skipping: [localhost] => (item=sshd) 
+skipping: [localhost] => (item=pollinate) 
+skipping: [localhost] => (item=tcpdump) 
+skipping: [localhost] => (item=landscape) 
+skipping: [localhost] => (item=fwupd-refresh) 
+skipping: [localhost] => (item=polkitd) 
+skipping: [localhost] => (item=ec2-instance-connect) 
+skipping: [localhost] => (item=_chrony) 
+skipping: [localhost] => (item=ubuntu) 
+skipping: [localhost]
+
+TASK [hardening : Lock the root password] **************************************
+changed: [localhost]
+
+TASK [hardening : Allow SSH before the firewall is switched on] ****************
+changed: [localhost]
+
+TASK [hardening : Deny incoming traffic by default] ****************************
+ok: [localhost]
+
+TASK [hardening : Allow outgoing traffic by default] ***************************
+ok: [localhost]
+
+TASK [hardening : Switch the firewall on] **************************************
+changed: [localhost]
+
+TASK [hardening : Apply kernel hardening settings] *****************************
+changed: [localhost] => (item=net.ipv4.ip_forward)
+changed: [localhost] => (item=net.ipv4.conf.all.rp_filter)
+changed: [localhost] => (item=net.ipv4.conf.default.rp_filter)
+changed: [localhost] => (item=net.ipv4.conf.all.accept_redirects)
+changed: [localhost] => (item=net.ipv4.conf.default.accept_redirects)
+changed: [localhost] => (item=net.ipv4.conf.all.send_redirects)
+changed: [localhost] => (item=net.ipv4.conf.all.accept_source_route)
+changed: [localhost] => (item=net.ipv4.tcp_syncookies)
+changed: [localhost] => (item=net.ipv4.icmp_echo_ignore_broadcasts)
+changed: [localhost] => (item=kernel.randomize_va_space)
+changed: [localhost] => (item=kernel.kptr_restrict)
+changed: [localhost] => (item=kernel.dmesg_restrict)
+changed: [localhost] => (item=fs.suid_dumpable)
+
+TASK [hardening : Write audit rules] *******************************************
+changed: [localhost]
+
+TASK [hardening : Enable the audit daemon] *************************************
+ok: [localhost]
+
+TASK [hardening : Enable automatic security updates] ***************************
+ok: [localhost]
+
+TASK [hardening : Set permissions on sensitive files] **************************
+ok: [localhost] => (item=/etc/passwd)
+ok: [localhost] => (item=/etc/group)
+ok: [localhost] => (item=/etc/shadow)
+ok: [localhost] => (item=/etc/gshadow)
+
+TASK [hardening : Disable rarely used filesystem modules] **********************
+changed: [localhost]
+
+TASK [hardening : Disable core dumps] ******************************************
+changed: [localhost]
+
+RUNNING HANDLER [hardening : Load audit rules] *********************************
+changed: [localhost]
+
+PLAY RECAP *********************************************************************
+localhost                  : ok=21   changed=14   unreachable=0    failed=0    skipped=1    rescued=0    ignored=0   
+
+Starting Ansible Pull at 2026-11-25 21:33:48
+/usr/bin/ansible-pull --url file:///var/lib/hardening/repo --checkout 9034f0a17e951e92a927ba57987a7e04e870269f --directory /var/lib/hardening/checkout --inventory localhost, 05-hardening-drift/ansible/local.yml

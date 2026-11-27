@@ -1,0 +1,26 @@
+---
+- name: Set permissions on sensitive files
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.mode }}"
+  loop: "{{ hardening_file_modes }}"
+  loop_control:
+    label: "{{ item.path }}"
+
+- name: Disable rarely used filesystem modules
+  ansible.builtin.template:
+    src: modprobe.conf.j2
+    dest: /etc/modprobe.d/99-hardening.conf
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Disable core dumps
+  ansible.builtin.copy:
+    dest: /etc/security/limits.d/99-hardening.conf
+    content: "* hard core 0\n"
+    owner: root
+    group: root
+    mode: "0644"

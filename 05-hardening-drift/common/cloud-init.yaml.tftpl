@@ -1,0 +1,77 @@
+#cloud-config
+# Rendered by Terraform. Contains no secrets: the repository is public and
+# the commit is pinned by SHA.
+package_update: true
+packages:
+  - git
+  - ansible-core
+  - lynis
+  - jq
+write_files:
+  - path: /etc/hardening/pull.env
+    permissions: "0644"
+    content: |
+      REPO_URL=${repo_url}
+      REPO_SHA=${repo_sha}
+      PROJECT_DIR=${project_dir}
+%{ if ansible_bundle_b64 != "" ~}
+  - path: /var/lib/hardening/ansible.tar.gz
+    encoding: b64
+    permissions: "0644"
+    content: ${ansible_bundle_b64}
+%{ endif ~}
+%{ if weak_baseline ~}
+  - path: /etc/ssh/sshd_config.d/10-lab-baseline.conf
+    permissions: "0644"
+    content: |
+      # Deliberately weak baseline for the lab. It simulates a hand-configured
+      # server so there is something to harden. No account has a password.
+      PermitRootLogin yes
+      PasswordAuthentication yes
+      X11Forwarding yes
+      MaxAuthTries 10
+%{ endif ~}
+  - path: /etc/systemd/system/lab-decoy.service
+    permissions: "0644"
+    content: |
+      [Unit]
+      Description=Decoy listener standing in for a service somebody left exposed
+      After=network.target
+
+      [Service]
+      ExecStart=/usr/bin/python3 -m http.server 8080 --bind 0.0.0.0 --directory /srv/decoy
+      Restart=on-failure
+
+      [Install]
+      WantedBy=multi-user.target
+  - path: /etc/systemd/system/hardening-pull.timer.d/interval.conf
+    permissions: "0644"
+    content: |
+      [Timer]
+      OnCalendar=
+      OnCalendar=*:0/${pull_interval_min}
+runcmd:
+  - mkdir -p /srv/decoy /var/lib/hardening
+  - echo "decoy" > /srv/decoy/index.html
+  - systemctl reload ssh
+%{ if ansible_bundle_b64 != "" ~}
+  - mkdir -p /var/lib/hardening/repo/${project_dir}/ansible
+  - tar -xzf /var/lib/hardening/ansible.tar.gz -C /var/lib/hardening/repo/${project_dir}/ansible
+  - git -C /var/lib/hardening/repo init -b main
+  - git -C /var/lib/hardening/repo config user.email "lab@localhost"
+  - git -C /var/lib/hardening/repo config user.name "lab"
+  - git -C /var/lib/hardening/repo add -A
+  - git -C /var/lib/hardening/repo commit -m "local bundle"
+  - sed -i "s|^REPO_URL=.*|REPO_URL=file:///var/lib/hardening/repo|; s|^REPO_SHA=.*|REPO_SHA=$(git -C /var/lib/hardening/repo rev-parse HEAD)|" /etc/hardening/pull.env
+%{ else ~}
+  - git clone ${repo_url} /var/lib/hardening/repo
+  - git -C /var/lib/hardening/repo checkout ${repo_sha}
+%{ endif ~}
+  - install -m 0755 /var/lib/hardening/repo/${project_dir}/ansible/files/hardening-pull /usr/local/bin/hardening-pull
+  - install -m 0644 /var/lib/hardening/repo/${project_dir}/ansible/files/hardening-pull.service /etc/systemd/system/hardening-pull.service
+  - install -m 0644 /var/lib/hardening/repo/${project_dir}/ansible/files/hardening-pull.timer /etc/systemd/system/hardening-pull.timer
+  - mkdir -p /usr/local/share/ansible/collections
+  - ansible-galaxy collection install -r /var/lib/hardening/repo/${project_dir}/ansible/requirements.yml -p /usr/local/share/ansible/collections
+  - systemctl daemon-reload
+  - systemctl enable --now lab-decoy.service
+  - touch /var/lib/hardening/bootstrap-done

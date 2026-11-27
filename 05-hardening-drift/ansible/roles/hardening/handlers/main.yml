@@ -1,0 +1,9 @@
+---
+- name: Reload sshd
+  ansible.builtin.service:
+    name: ssh
+    state: reloaded
+
+- name: Load audit rules
+  ansible.builtin.command: augenrules --load
+  changed_when: true
